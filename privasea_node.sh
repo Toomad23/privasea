@@ -81,6 +81,13 @@ view_logs() {
     docker logs --follow privanetix-node
 }
 
+# Функция для перезапуска ноды
+restart_node() {
+    echo "Перезапуск ноды..."
+    docker restart privanetix-node
+    echo "Нода успешно перезапущена."
+}
+
 # Функция для удаления ноды
 remove_node() {
     echo "Остановка и удаление ноды..."
@@ -108,9 +115,10 @@ update_node() {
 while true; do
     echo "1. Установка ноды"
     echo "2. Просмотр логов"
-    echo "3. Удаление ноды"
-    echo "4. Обновление ноды"
-    echo "5. Выход"
+    echo "3. Перезапуск ноды"
+    echo "4. Удаление ноды"
+    echo "5. Обновление ноды"
+    echo "6. Выход"
     read -p "Выберите опцию: " OPTION
 
     case $OPTION in
@@ -121,12 +129,15 @@ while true; do
             view_logs
             ;;
         3)
-            remove_node
+            restart_node
             ;;
         4)
-            update_node
+            remove_node
             ;;
         5)
+            update_node
+            ;;
+        6)
             echo "Выход..."
             exit 0
             ;;
