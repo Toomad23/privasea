@@ -1,17 +1,45 @@
 #!/bin/bash
 
-# Функция для установки ноды
-install_node() {
-    echo "Обновление пакетов и установка Docker..."
+# Функция для проверки установки Docker
+check_docker() {
+    if command -v docker &> /dev/null; then
+        echo "Docker уже установлен."
+        DOCKER_VERSION=$(docker --version | awk '{print $3}' | tr -d ',')
+        echo "Версия Docker: $DOCKER_VERSION"
+
+        # Проверка минимальной версии Docker (пример: 20.10.0)
+        REQUIRED_VERSION="20.10.0"
+        if printf '%s\n%s\n' "$REQUIRED_VERSION" "$DOCKER_VERSION" | sort -V -C; then
+            echo "Версия Docker подходит."
+            return 0
+        else
+            echo "Версия Docker устарела. Требуется обновление."
+            return 1
+        fi
+    else
+        echo "Docker не установлен."
+        return 1
+    fi
+}
+
+# Функция для установки Docker
+install_docker() {
+    echo "Установка Docker..."
     sudo apt update && sudo apt upgrade -y
 
-    echo "Добавление ключа Docker и настройка репозитория..."
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --batch --yes --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
     echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 
     sudo apt-get update
     sudo apt-get install -y docker-ce docker-ce-cli containerd.io
     docker version
+}
+
+# Функция для установки ноды
+install_node() {
+    if ! check_docker; then
+        install_docker
+    fi
 
     echo "Установка Docker Compose..."
     VER=$(curl -s https://api.github.com/repos/docker/compose/releases/latest | grep tag_name | cut -d '"' -f 4)
