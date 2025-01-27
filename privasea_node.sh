@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# Функция для вывода красного текста
+red_echo() {
+    echo -e "\e[31m$1\e[0m"
+}
+
 # Функция для проверки установки Docker
 check_docker() {
     if command -v docker &> /dev/null; then
@@ -63,11 +68,11 @@ install_node() {
     echo "Сохранение информации о кошельке..."
     mv $HOME/privasea/config/UTC--* $HOME/privasea/config/wallet_keystore
 
-    echo "Кошелек сохранен в: $HOME/privasea/config/wallet_keystore"
-    echo "Добавьте этот файл в Metamask через импорт JSON."
-
-    echo "Перейдите на https://deepsea-beta.privasea.ai/, подключите кошелек и получите faucet."
-    echo "Нажмите 'Set up my node', введите имя ноды и адрес кошелька, установите комиссию на 1% и подтвердите."
+    # Выделение текста красным цветом
+    red_echo "Кошелек сохранен в: $HOME/privasea/config/wallet_keystore"
+    red_echo "Добавьте этот файл в Metamask через импорт JSON."
+    red_echo "Перейдите на https://deepsea-beta.privasea.ai/, подключите кошелек и получите faucet."
+    red_echo "Нажмите 'Set up my node', введите имя ноды и адрес кошелька, установите комиссию на 1% и подтвердите."
 
     echo "Запуск ноды..."
     docker run -d --name privanetix-node -v "$HOME/privasea/config:/app/config" -e KEYSTORE_PASSWORD=$PASSWORD privasea/acceleration-node-beta:latest
